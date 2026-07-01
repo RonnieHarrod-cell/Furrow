@@ -72,6 +72,8 @@ add_executable(FarmEngine
   src/engine/core/Window.cpp
   src/engine/render/Shader.cpp
   src/engine/render/Camera.cpp
+  src/engine/render/Mesh.cpp
+  src/engine/render/Raycast.cpp
 )
 
 target_include_directories(FarmEngine PRIVATE src)

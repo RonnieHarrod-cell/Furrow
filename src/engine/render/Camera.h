@@ -15,6 +15,8 @@ namespace engine
         void ProcessKeyboard(bool forward, bool backward, bool left, bool right, float deltaTime);
         void ProcessMouseMovement(float deltaX, float deltaY);
 
+        glm::vec3 GetPosition() const { return m_Position; }
+
     private:
         void UpdateVectors();
 

@@ -5,6 +5,7 @@
 #include "engine/core/Window.h"
 #include "engine/render/Shader.h"
 #include "engine/render/Camera.h"
+#include "engine/render/Mesh.h"
 
 namespace engine
 {
@@ -25,8 +26,8 @@ namespace engine
         std::unique_ptr<Shader> m_Shader;
         std::unique_ptr<Camera> m_Camera;
 
-        unsigned int m_VAO = 0;
-        unsigned int m_VBO = 0;
+        std::unique_ptr<Mesh> m_CubeMesh;
+        std::unique_ptr<Mesh> m_GroundMesh;
 
         glm::vec3 m_ClearColor{0.10f, 0.42f, 0.20f}; // farm-field green
         float m_TimeAccum = 0.0f;
@@ -35,5 +36,11 @@ namespace engine
 
         bool m_CameraControlEnabled = true;
         bool m_AltWasPressed = false;
+
+        float m_TileSize = 1.0f;
+        bool m_HasHoveredTile = false;
+        int m_HoveredTileX = 0;
+        int m_HoveredTileZ = 0;
+        glm::vec3 m_HoveredWorldPoint{0.0f};
     };
 } // namespace engine

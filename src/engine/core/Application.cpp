@@ -6,240 +6,287 @@
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
+#include <vector>
+#include <cmath>
+#include "engine/render/Raycast.h"
 
 namespace engine
 {
 
-    static const float kCubeVertices[] = {
-        // positions          // colors
-        // Front face (red-ish)
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.8f,
-        0.3f,
-        0.3f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.8f,
-        0.3f,
-        0.3f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.8f,
-        0.3f,
-        0.3f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.8f,
-        0.3f,
-        0.3f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        0.8f,
-        0.3f,
-        0.3f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.8f,
-        0.3f,
-        0.3f,
+    static std::vector<float> BuildCubeVertices()
+    {
+        return {
+            // positions          // colors
+            -0.5f,
+            -0.5f,
+            0.5f,
+            0.8f,
+            0.3f,
+            0.3f,
+            0.5f,
+            -0.5f,
+            0.5f,
+            0.8f,
+            0.3f,
+            0.3f,
+            0.5f,
+            0.5f,
+            0.5f,
+            0.8f,
+            0.3f,
+            0.3f,
+            0.5f,
+            0.5f,
+            0.5f,
+            0.8f,
+            0.3f,
+            0.3f,
+            -0.5f,
+            0.5f,
+            0.5f,
+            0.8f,
+            0.3f,
+            0.3f,
+            -0.5f,
+            -0.5f,
+            0.5f,
+            0.8f,
+            0.3f,
+            0.3f,
 
-        // Back face (blue-ish)
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.3f,
-        0.4f,
-        0.8f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        0.3f,
-        0.4f,
-        0.8f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.3f,
-        0.4f,
-        0.8f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.3f,
-        0.4f,
-        0.8f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.3f,
-        0.4f,
-        0.8f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.3f,
-        0.4f,
-        0.8f,
+            -0.5f,
+            -0.5f,
+            -0.5f,
+            0.3f,
+            0.4f,
+            0.8f,
+            -0.5f,
+            0.5f,
+            -0.5f,
+            0.3f,
+            0.4f,
+            0.8f,
+            0.5f,
+            0.5f,
+            -0.5f,
+            0.3f,
+            0.4f,
+            0.8f,
+            0.5f,
+            0.5f,
+            -0.5f,
+            0.3f,
+            0.4f,
+            0.8f,
+            0.5f,
+            -0.5f,
+            -0.5f,
+            0.3f,
+            0.4f,
+            0.8f,
+            -0.5f,
+            -0.5f,
+            -0.5f,
+            0.3f,
+            0.4f,
+            0.8f,
 
-        // Left face (green-ish)
-        -0.5f,
-        0.5f,
-        0.5f,
-        0.3f,
-        0.7f,
-        0.4f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        0.3f,
-        0.7f,
-        0.4f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.3f,
-        0.7f,
-        0.4f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.3f,
-        0.7f,
-        0.4f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.3f,
-        0.7f,
-        0.4f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        0.3f,
-        0.7f,
-        0.4f,
+            -0.5f,
+            0.5f,
+            0.5f,
+            0.3f,
+            0.7f,
+            0.4f,
+            -0.5f,
+            0.5f,
+            -0.5f,
+            0.3f,
+            0.7f,
+            0.4f,
+            -0.5f,
+            -0.5f,
+            -0.5f,
+            0.3f,
+            0.7f,
+            0.4f,
+            -0.5f,
+            -0.5f,
+            -0.5f,
+            0.3f,
+            0.7f,
+            0.4f,
+            -0.5f,
+            -0.5f,
+            0.5f,
+            0.3f,
+            0.7f,
+            0.4f,
+            -0.5f,
+            0.5f,
+            0.5f,
+            0.3f,
+            0.7f,
+            0.4f,
 
-        // Right face (yellow-ish)
-        0.5f,
-        0.5f,
-        0.5f,
-        0.8f,
-        0.7f,
-        0.3f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.8f,
-        0.7f,
-        0.3f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.8f,
-        0.7f,
-        0.3f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.8f,
-        0.7f,
-        0.3f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.8f,
-        0.7f,
-        0.3f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.8f,
-        0.7f,
-        0.3f,
+            0.5f,
+            0.5f,
+            0.5f,
+            0.8f,
+            0.7f,
+            0.3f,
+            0.5f,
+            -0.5f,
+            -0.5f,
+            0.8f,
+            0.7f,
+            0.3f,
+            0.5f,
+            0.5f,
+            -0.5f,
+            0.8f,
+            0.7f,
+            0.3f,
+            0.5f,
+            -0.5f,
+            -0.5f,
+            0.8f,
+            0.7f,
+            0.3f,
+            0.5f,
+            0.5f,
+            0.5f,
+            0.8f,
+            0.7f,
+            0.3f,
+            0.5f,
+            -0.5f,
+            0.5f,
+            0.8f,
+            0.7f,
+            0.3f,
 
-        // Bottom face (purple-ish)
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.6f,
-        0.3f,
-        0.7f,
-        0.5f,
-        -0.5f,
-        -0.5f,
-        0.6f,
-        0.3f,
-        0.7f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.6f,
-        0.3f,
-        0.7f,
-        0.5f,
-        -0.5f,
-        0.5f,
-        0.6f,
-        0.3f,
-        0.7f,
-        -0.5f,
-        -0.5f,
-        0.5f,
-        0.6f,
-        0.3f,
-        0.7f,
-        -0.5f,
-        -0.5f,
-        -0.5f,
-        0.6f,
-        0.3f,
-        0.7f,
+            -0.5f,
+            -0.5f,
+            -0.5f,
+            0.6f,
+            0.3f,
+            0.7f,
+            0.5f,
+            -0.5f,
+            -0.5f,
+            0.6f,
+            0.3f,
+            0.7f,
+            0.5f,
+            -0.5f,
+            0.5f,
+            0.6f,
+            0.3f,
+            0.7f,
+            0.5f,
+            -0.5f,
+            0.5f,
+            0.6f,
+            0.3f,
+            0.7f,
+            -0.5f,
+            -0.5f,
+            0.5f,
+            0.6f,
+            0.3f,
+            0.7f,
+            -0.5f,
+            -0.5f,
+            -0.5f,
+            0.6f,
+            0.3f,
+            0.7f,
 
-        // Top face (orange-ish)
-        -0.5f,
-        0.5f,
-        -0.5f,
-        0.9f,
-        0.5f,
-        0.2f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.9f,
-        0.5f,
-        0.2f,
-        0.5f,
-        0.5f,
-        -0.5f,
-        0.9f,
-        0.5f,
-        0.2f,
-        0.5f,
-        0.5f,
-        0.5f,
-        0.9f,
-        0.5f,
-        0.2f,
-        -0.5f,
-        0.5f,
-        -0.5f,
-        0.9f,
-        0.5f,
-        0.2f,
-        -0.5f,
-        0.5f,
-        0.5f,
-        0.9f,
-        0.5f,
-        0.2f,
-    };
+            -0.5f,
+            0.5f,
+            -0.5f,
+            0.9f,
+            0.5f,
+            0.2f,
+            0.5f,
+            0.5f,
+            0.5f,
+            0.9f,
+            0.5f,
+            0.2f,
+            0.5f,
+            0.5f,
+            -0.5f,
+            0.9f,
+            0.5f,
+            0.2f,
+            0.5f,
+            0.5f,
+            0.5f,
+            0.9f,
+            0.5f,
+            0.2f,
+            -0.5f,
+            0.5f,
+            -0.5f,
+            0.9f,
+            0.5f,
+            0.2f,
+            -0.5f,
+            0.5f,
+            0.5f,
+            0.9f,
+            0.5f,
+            0.2f,
+        };
+    }
+
+    static std::vector<float> BuildGroundVertices(float size)
+    {
+        float h = size * 0.5f;
+        float r = 0.25f, g = 0.55f, b = 0.25f; // grass-ish green
+
+        return {
+            // positions        // colors
+            -h,
+            0.0f,
+            -h,
+            r,
+            g,
+            b,
+            h,
+            0.0f,
+            -h,
+            r,
+            g,
+            b,
+            h,
+            0.0f,
+            h,
+            r,
+            g,
+            b,
+
+            h,
+            0.0f,
+            h,
+            r,
+            g,
+            b,
+            -h,
+            0.0f,
+            h,
+            r,
+            g,
+            b,
+            -h,
+            0.0f,
+            -h,
+            r,
+            g,
+            b,
+        };
+    }
 
     Application::Application()
     {
@@ -257,26 +304,12 @@ namespace engine
 
         glEnable(GL_DEPTH_TEST);
 
-        glGenVertexArrays(1, &m_VAO);
-        glGenBuffers(1, &m_VBO);
-
-        glBindVertexArray(m_VAO);
-        glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(kCubeVertices), kCubeVertices, GL_STATIC_DRAW);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
-
-        glBindVertexArray(0);
+        m_CubeMesh = std::make_unique<Mesh>(BuildCubeVertices());
+        m_GroundMesh = std::make_unique<Mesh>(BuildGroundVertices(20.0f));
     }
 
     Application::~Application()
     {
-        glDeleteVertexArrays(1, &m_VAO);
-        glDeleteBuffers(1, &m_VBO);
-
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
@@ -329,6 +362,26 @@ namespace engine
             m_Window->SetCursorLocked(m_CameraControlEnabled);
         }
         m_AltWasPressed = altPressed;
+
+        float aspect = static_cast<float>(m_Window->GetWidth()) / static_cast<float>(m_Window->GetHeight());
+        glm::mat4 view = m_Camera->GetViewMatrix();
+        glm::mat4 projection = m_Camera->GetProjectionMatrix(aspect);
+        glm::vec2 mousePos = m_Window->GetMousePosition();
+
+        glm::vec3 hitPoint;
+        m_HasHoveredTile = ScreenToGroundPoint(
+            mousePos,
+            m_Window->GetWidth(), m_Window->GetHeight(),
+            m_Camera->GetPosition(),
+            view, projection,
+            hitPoint);
+
+        if (m_HasHoveredTile)
+        {
+            m_HoveredWorldPoint = hitPoint;
+            m_HoveredTileX = static_cast<int>(std::floor(hitPoint.x / m_TileSize));
+            m_HoveredTileZ = static_cast<int>(std::floor(hitPoint.z / m_TileSize));
+        }
     }
 
     void Application::Render()
@@ -337,16 +390,18 @@ namespace engine
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         float aspect = static_cast<float>(m_Window->GetWidth()) / static_cast<float>(m_Window->GetHeight());
-        glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view = m_Camera->GetViewMatrix();
-        glm::mat4 procjection = m_Camera->GetProjectionMatrix(aspect);
-        glm::mat4 mvp = procjection * view * model;
+        glm::mat4 projection = m_Camera->GetProjectionMatrix(aspect);
 
         m_Shader->Bind();
-        m_Shader->SetMat4("uMVP", mvp);
 
-        glBindVertexArray(m_VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glm::mat4 groundModel = glm::mat4(1.0f);
+        m_Shader->SetMat4("uMVP", projection * view * groundModel);
+        m_GroundMesh->Draw();
+
+        glm::mat4 cubeModel = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.5f, 0.0f));
+        m_Shader->SetMat4("uMVP", projection * view * cubeModel);
+        m_CubeMesh->Draw();
 
         RenderDebugUI();
     }
@@ -360,8 +415,18 @@ namespace engine
         ImGui::Begin("Engine debug");
         ImGui::Text("FPS: %.1f", m_Fps);
         ImGui::ColorEdit3("Clear color", &m_ClearColor.x);
-        ImGui::Text("This panel is your engine's dev console.");
-        ImGui::Text("Add crop/tile/inventory debug widgets here as you build them.");
+        ImGui::Text("Camera control: %s (Left Alt to toggle)", m_CameraControlEnabled ? "ON" : "OFF");
+        ImGui::Separator();
+        if (m_HasHoveredTile)
+        {
+            ImGui::Text("Hovered tile: %d, %d", m_HoveredTileX, m_HoveredTileZ);
+            ImGui::Text("World point: %.2f, %.2f, %.2f",
+                        m_HoveredWorldPoint.x, m_HoveredWorldPoint.y, m_HoveredWorldPoint.z);
+        }
+        else
+        {
+            ImGui::Text("Hovered tile: none (looking away from ground)");
+        }
         ImGui::End();
 
         ImGui::Render();

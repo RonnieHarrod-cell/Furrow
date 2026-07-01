@@ -25,6 +25,7 @@ namespace engine
         bool GetKey(int key) const;
 
         glm::vec2 GetMouseDelta();
+        glm::vec2 GetMousePosition() const;
 
         void SetCursorLocked(bool locked);
 

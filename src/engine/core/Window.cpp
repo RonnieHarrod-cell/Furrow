@@ -92,6 +92,11 @@ namespace engine
         return delta;
     }
 
+    glm::vec2 Window::GetMousePosition() const
+    {
+        return glm::vec2(static_cast<float>(m_LastMouseX), static_cast<float>(m_LastMouseY));
+    }
+
     void Window::MouseCallback(GLFWwindow *window, double xpos, double ypos)
     {
         Window *self = static_cast<Window *>(glfwGetWindowUserPointer(window));
