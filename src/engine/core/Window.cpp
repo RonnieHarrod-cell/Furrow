@@ -117,4 +117,9 @@ namespace engine
         self->m_LastMouseX = xpos;
         self->m_LastMouseY = ypos;
     }
+
+    bool Window::GetMouseButton(int button) const
+    {
+        return glfwGetMouseButton(m_Handle, button) == GLFW_PRESS;
+    }
 } // namespace engine

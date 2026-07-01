@@ -12,7 +12,7 @@ namespace engine
         glm::mat4 GetViewMatrix() const;
         glm::mat4 GetProjectionMatrix(float aspectRatio) const;
 
-        void ProcessKeyboard(bool forward, bool backward, bool left, bool right, float deltaTime);
+        void ProcessKeyboard(bool forward, bool backward, bool left, bool right, bool up, bool down, float deltaTime);
         void ProcessMouseMovement(float deltaX, float deltaY);
 
         glm::vec3 GetPosition() const { return m_Position; }

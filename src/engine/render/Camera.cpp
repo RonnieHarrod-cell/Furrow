@@ -23,7 +23,7 @@ namespace engine
         return glm::perspective(glm::radians(m_Fov), aspectRatio, 0.1f, 100.0f);
     }
 
-    void Camera::ProcessKeyboard(bool forward, bool backward, bool left, bool right, float deltaTime)
+    void Camera::ProcessKeyboard(bool forward, bool backward, bool left, bool right, bool up, bool down, float deltaTime)
     {
         float velocity = m_MoveSpeed * deltaTime;
 
@@ -42,6 +42,14 @@ namespace engine
         if (right)
         {
             m_Position += m_Right * velocity;
+        }
+        if (up)
+        {
+            m_Position += m_WorldUp * velocity;
+        }
+        if (down)
+        {
+            m_Position -= m_WorldUp * velocity;
         }
     }
 

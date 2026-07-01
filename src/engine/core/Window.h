@@ -23,6 +23,7 @@ namespace engine
         GLFWwindow *GetNativeHandle() const { return m_Handle; }
 
         bool GetKey(int key) const;
+        bool GetMouseButton(int button) const;
 
         glm::vec2 GetMouseDelta();
         glm::vec2 GetMousePosition() const;
