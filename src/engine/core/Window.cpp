@@ -38,6 +38,8 @@ namespace engine
 
         glfwMakeContextCurrent(m_Handle);
         glfwSetFramebufferSizeCallback(m_Handle, FramebufferSizeCallback);
+        glfwSetWindowUserPointer(m_Handle, this);
+        glfwSetCursorPosCallback(m_Handle, MouseCallback);
         glfwSwapInterval(1); // vsync
 
         if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -70,5 +72,44 @@ namespace engine
     void Window::PollEvents()
     {
         glfwPollEvents();
+    }
+
+    void Window::SetCursorLocked(bool locked)
+    {
+        glfwSetInputMode(m_Handle, GLFW_CURSOR, locked ? GLFW_CURSOR_HIDDEN : GLFW_CURSOR_NORMAL);
+    }
+
+    bool Window::GetKey(int key) const
+    {
+        return glfwGetKey(m_Handle, key) == GLFW_PRESS;
+    }
+
+    glm::vec2 Window::GetMouseDelta()
+    {
+        glm::vec2 delta(static_cast<float>(m_MouseDeltaX), static_cast<float>(m_MouseDeltaY));
+        m_MouseDeltaX = 0.0;
+        m_MouseDeltaY = 0.0;
+        return delta;
+    }
+
+    void Window::MouseCallback(GLFWwindow *window, double xpos, double ypos)
+    {
+        Window *self = static_cast<Window *>(glfwGetWindowUserPointer(window));
+        if (!self)
+            return;
+
+        if (self->m_FirstMouse)
+        {
+            self->m_LastMouseX = xpos;
+            self->m_LastMouseY = ypos;
+            self->m_FirstMouse = false;
+            return;
+        }
+
+        self->m_MouseDeltaX += xpos - self->m_LastMouseX;
+        self->m_MouseDeltaY += self->m_LastMouseY - ypos;
+
+        self->m_LastMouseX = xpos;
+        self->m_LastMouseY = ypos;
     }
 } // namespace engine

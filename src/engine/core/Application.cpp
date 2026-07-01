@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
@@ -9,34 +10,242 @@
 namespace engine
 {
 
-    // A single triangle in NDC space, colored per-vertex — this is the
-    // "hello world" of the renderer. Swap this out for real mesh loading
-    // (via Assimp) once the pipeline is proven.
-    static const float kTriangleVertices[] = {
+    static const float kCubeVertices[] = {
         // positions          // colors
-        0.0f,
+        // Front face (red-ish)
+        -0.5f,
+        -0.5f,
         0.5f,
-        0.0f,
-        0.9f,
-        0.7f,
-        0.2f,
-        -0.5f,
-        -0.5f,
-        0.0f,
+        0.8f,
         0.3f,
+        0.3f,
+        0.5f,
+        -0.5f,
+        0.5f,
+        0.8f,
+        0.3f,
+        0.3f,
+        0.5f,
+        0.5f,
+        0.5f,
+        0.8f,
+        0.3f,
+        0.3f,
+        0.5f,
+        0.5f,
+        0.5f,
+        0.8f,
+        0.3f,
+        0.3f,
+        -0.5f,
+        0.5f,
+        0.5f,
+        0.8f,
+        0.3f,
+        0.3f,
+        -0.5f,
+        -0.5f,
+        0.5f,
+        0.8f,
+        0.3f,
+        0.3f,
+
+        // Back face (blue-ish)
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        0.3f,
+        0.4f,
+        0.8f,
+        -0.5f,
+        0.5f,
+        -0.5f,
+        0.3f,
+        0.4f,
+        0.8f,
+        0.5f,
+        0.5f,
+        -0.5f,
+        0.3f,
+        0.4f,
+        0.8f,
+        0.5f,
+        0.5f,
+        -0.5f,
+        0.3f,
+        0.4f,
+        0.8f,
+        0.5f,
+        -0.5f,
+        -0.5f,
+        0.3f,
+        0.4f,
+        0.8f,
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        0.3f,
+        0.4f,
+        0.8f,
+
+        // Left face (green-ish)
+        -0.5f,
+        0.5f,
+        0.5f,
+        0.3f,
+        0.7f,
+        0.4f,
+        -0.5f,
+        0.5f,
+        -0.5f,
+        0.3f,
+        0.7f,
+        0.4f,
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        0.3f,
+        0.7f,
+        0.4f,
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        0.3f,
+        0.7f,
+        0.4f,
+        -0.5f,
+        -0.5f,
+        0.5f,
+        0.3f,
+        0.7f,
+        0.4f,
+        -0.5f,
+        0.5f,
+        0.5f,
+        0.3f,
+        0.7f,
+        0.4f,
+
+        // Right face (yellow-ish)
+        0.5f,
+        0.5f,
+        0.5f,
+        0.8f,
+        0.7f,
+        0.3f,
+        0.5f,
+        -0.5f,
+        -0.5f,
+        0.8f,
+        0.7f,
+        0.3f,
+        0.5f,
+        0.5f,
+        -0.5f,
+        0.8f,
+        0.7f,
+        0.3f,
+        0.5f,
+        -0.5f,
+        -0.5f,
+        0.8f,
+        0.7f,
+        0.3f,
+        0.5f,
+        0.5f,
+        0.5f,
+        0.8f,
+        0.7f,
+        0.3f,
+        0.5f,
+        -0.5f,
+        0.5f,
+        0.8f,
+        0.7f,
+        0.3f,
+
+        // Bottom face (purple-ish)
+        -0.5f,
+        -0.5f,
+        -0.5f,
         0.6f,
         0.3f,
+        0.7f,
         0.5f,
         -0.5f,
-        0.0f,
+        -0.5f,
+        0.6f,
+        0.3f,
+        0.7f,
         0.5f,
-        0.35f,
+        -0.5f,
+        0.5f,
+        0.6f,
+        0.3f,
+        0.7f,
+        0.5f,
+        -0.5f,
+        0.5f,
+        0.6f,
+        0.3f,
+        0.7f,
+        -0.5f,
+        -0.5f,
+        0.5f,
+        0.6f,
+        0.3f,
+        0.7f,
+        -0.5f,
+        -0.5f,
+        -0.5f,
+        0.6f,
+        0.3f,
+        0.7f,
+
+        // Top face (orange-ish)
+        -0.5f,
+        0.5f,
+        -0.5f,
+        0.9f,
+        0.5f,
+        0.2f,
+        0.5f,
+        0.5f,
+        0.5f,
+        0.9f,
+        0.5f,
+        0.2f,
+        0.5f,
+        0.5f,
+        -0.5f,
+        0.9f,
+        0.5f,
+        0.2f,
+        0.5f,
+        0.5f,
+        0.5f,
+        0.9f,
+        0.5f,
+        0.2f,
+        -0.5f,
+        0.5f,
+        -0.5f,
+        0.9f,
+        0.5f,
+        0.2f,
+        -0.5f,
+        0.5f,
+        0.5f,
+        0.9f,
+        0.5f,
         0.2f,
     };
 
     Application::Application()
     {
-        m_Window = std::make_unique<Window>(1280, 720, "Farm Engine");
+        m_Window = std::make_unique<Window>(1280, 720, "Furrow");
+        m_Camera = std::make_unique<Camera>(glm::vec3(0.0f, 0.0f, 3.0f));
+        m_Window->SetCursorLocked(true);
 
         ImGui::CreateContext();
         ImGui_ImplGlfw_InitForOpenGL(m_Window->GetNativeHandle(), true);
@@ -46,12 +255,14 @@ namespace engine
             "assets/shaders/basic.vert",
             "assets/shaders/basic.frag");
 
+        glEnable(GL_DEPTH_TEST);
+
         glGenVertexArrays(1, &m_VAO);
         glGenBuffers(1, &m_VBO);
 
         glBindVertexArray(m_VAO);
         glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(kTriangleVertices), kTriangleVertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(kCubeVertices), kCubeVertices, GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
         glEnableVertexAttribArray(0);
@@ -98,16 +309,44 @@ namespace engine
             m_TimeAccum = 0.0f;
             m_FrameCount = 0;
         }
+
+        bool forward = m_Window->GetKey(GLFW_KEY_W);
+        bool backward = m_Window->GetKey(GLFW_KEY_S);
+        bool left = m_Window->GetKey(GLFW_KEY_A);
+        bool right = m_Window->GetKey(GLFW_KEY_D);
+        m_Camera->ProcessKeyboard(forward, backward, left, right, deltaTime);
+
+        glm::vec2 mouseDelta = m_Window->GetMouseDelta();
+        if (m_CameraControlEnabled)
+        {
+            m_Camera->ProcessMouseMovement(mouseDelta.x, mouseDelta.y);
+        }
+
+        bool altPressed = m_Window->GetKey(GLFW_KEY_LEFT_ALT);
+        if (altPressed && !m_AltWasPressed)
+        {
+            m_CameraControlEnabled = !m_CameraControlEnabled;
+            m_Window->SetCursorLocked(m_CameraControlEnabled);
+        }
+        m_AltWasPressed = altPressed;
     }
 
     void Application::Render()
     {
         glClearColor(m_ClearColor.r, m_ClearColor.g, m_ClearColor.b, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        float aspect = static_cast<float>(m_Window->GetWidth()) / static_cast<float>(m_Window->GetHeight());
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = m_Camera->GetViewMatrix();
+        glm::mat4 procjection = m_Camera->GetProjectionMatrix(aspect);
+        glm::mat4 mvp = procjection * view * model;
 
         m_Shader->Bind();
+        m_Shader->SetMat4("uMVP", mvp);
+
         glBindVertexArray(m_VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         RenderDebugUI();
     }
